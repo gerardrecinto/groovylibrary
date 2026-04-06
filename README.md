@@ -1,6 +1,6 @@
 # Jenkins Shared Library
 
-Reusable Jenkins Shared Library for standardizing CI/CD pipelines across Python microservice teams. Covers build, test, Docker, Kubernetes deployment, Slack notifications, and LLM-powered failure analysis.
+Reusable Jenkins Shared Library for standardizing CI/CD pipelines across Python microservice teams. Covers build, test, Docker, Kubernetes deployment, Slack and Teams notifications, and LLM-powered failure analysis.
 
 ## Library Structure
 
@@ -9,7 +9,8 @@ vars/
 ├── buildPython.groovy        # install deps, lint, pytest, coverage enforcement
 ├── dockerBuildPush.groovy    # build + push Docker image with SHA and latest tags
 ├── deployK8s.groovy          # kubectl apply with rollout status + auto-rollback
-├── notifySlack.groovy        # webhook-based build status notifications
+├── notifySlack.groovy        # Slack webhook build status notifications
+├── notifyTeams.groovy        # Microsoft Teams Incoming Webhook notifications
 └── llmAnalyzeFailure.groovy  # ships build log to LLM API, posts root cause to Slack
 ```
 
@@ -82,6 +83,20 @@ notifySlack(
     status: 'SUCCESS',
     channel: '#ci-cd',
     webhookCredential: 'slack-webhook-url',
+    message: "Build #${env.BUILD_NUMBER} deployed to production"
+)
+```
+
+---
+
+### `notifyTeams(config)`
+
+Posts a color-coded Actionable Message Card to a Microsoft Teams channel via Incoming Webhook.
+
+```groovy
+notifyTeams(
+    status: 'SUCCESS',   // SUCCESS | FAILURE | UNSTABLE
+    webhookCredential: 'teams-webhook-url',
     message: "Build #${env.BUILD_NUMBER} deployed to production"
 )
 ```
